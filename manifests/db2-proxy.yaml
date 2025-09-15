@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: db2-proxy
+  namespace: data-dev
+  labels:
+    app: db2-proxy
+spec:
+  selector:
+    matchLabels:
+      app: db2-proxy
+  template:
+    metadata:
+      labels:
+        app: db2-proxy
+    spec:
+      hostNetwork: true
+      containers:
+        - name: db2-proxy
+          image: alpine/socat:latest
+          command: ["socat"]
+          args: ["TCP-LISTEN:60004,fork,reuseaddr", "TCP:172.18.75.70:60004"]
+          resources:
+            limits:
+              cpu: 50m
+              memory: 64Mi
+            requests:
+              cpu: 25m
+              memory: 32Mi
+      restartPolicy: Always
+  updateStrategy:
+    type: RollingUpdate

@@ -1,0 +1,41 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: postgres-sink
+  namespace: data-dev
+  labels:
+    strimzi.io/cluster: my-connect
+spec:
+  class: io.confluent.connect.jdbc.JdbcSinkConnector
+  tasksMax: 1
+  config:
+    topics: "<prefix.schema.table_name>"
+    table.name.format: "<schema.table_name>"
+
+    connection.url: "jdbc:postgresql://<postgresql-ip>:5432/<DB-name>"
+    connection.user: "<Username>"
+    connection.password: "<Password>"
+
+    auto.create: true
+    auto.evolve: true
+
+    pk.mode: record_value
+    pk.fields: SKM_PRAN
+    insert.mode: upsert
+    delete.enabled: false
+
+    batch.size: 500
+    max.retries: 15
+    retry.backoff.ms: 5000
+
+    key.converter: "org.apache.kafka.connect.json.JsonConverter"
+    key.converter.schemas.enable: false
+    value.converter: "org.apache.kafka.connect.json.JsonConverter"
+    value.converter.schemas.enable: true
+
+    transforms: dropTombstones
+    transforms.dropTombstones.type: org.apache.kafka.connect.transforms.Filter
+    transforms.dropTombstones.predicate: isTombstone
+
+    predicates: isTombstone
+    predicates.isTombstone.type: org.apache.kafka.connect.transforms.predicates.RecordIsTombstone

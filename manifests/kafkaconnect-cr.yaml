@@ -1,0 +1,27 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: my-connect
+  namespace: data-dev
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  version: 3.9.0
+  replicas: 1
+  bootstrapServers: my-cluster-kafka-bootstrap.data-dev.svc:9092
+  image: sharmaaakash170/db2-connect:v15
+  config:
+    group.id: my-connect-group
+    offset.storage.topic: my-connect-offsets
+    config.storage.topic: my-connect-configs
+    status.storage.topic: my-connect-status
+    offset.storage.replication.factor: 1
+    config.storage.replication.factor: 1
+    status.storage.replication.factor: 1
+    log4j.rootLogger: DEBUG, stdout
+    log4j.logger.org.apache.kafka.connect.runtime.isolation.DelegatingClassLoader: DEBUG
+    key.converter: org.apache.kafka.connect.json.JsonConverter
+    value.converter: org.apache.kafka.connect.json.JsonConverter
+    key.converter.schemas.enable: false
+    value.converter.schemas.enable: false
+    plugin.path: /opt/kafka/plugins
