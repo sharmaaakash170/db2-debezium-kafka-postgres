@@ -3,7 +3,10 @@ USER root:root
 
 RUN mkdir -p /opt/kafka/plugins/kafka-connect-jdbc
 RUN mkdir -p /opt/kafka/plugins/debezium-connector-db2
+RUN mkdir -p /opt/kafka/plugins/lowercase-transform
 
+COPY lowercase-transform/lowercase-transform-1.0-SNAPSHOT.jar /opt/kafka/plugins/lowercase-transform/
+COPY lowercase-transform/plugin.properties /opt/kafka/plugins/lowercase-transform/
 COPY kafka-connect-jdbc-10.8.4.jar /opt/kafka/plugins/kafka-connect-jdbc/
 COPY postgresql-42.7.4.jar /opt/kafka/plugins/kafka-connect-jdbc/
 COPY plugin.properties /opt/kafka/plugins/kafka-connect-jdbc/

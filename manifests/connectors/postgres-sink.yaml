@@ -9,33 +9,38 @@ spec:
   class: io.confluent.connect.jdbc.JdbcSinkConnector
   tasksMax: 1
   config:
-    topics: "<prefix.schema.table_name>"
-    table.name.format: "<schema.table_name>"
+    # topics: "db2.bank.bnk_contr_fl_sts"
+    # table.name.format: "bank.bnk_contr_fl_sts"
 
-    connection.url: "jdbc:postgresql://<postgresql-ip>:5432/<DB-name>"
-    connection.user: "<Username>"
-    connection.password: "<Password>"
+    topics: "db2.acc.acc_batch_penalty"
+    table.name.format: "acc.acc_batch_penalty"
+    # ALTER TABLE acc.acc_batch_penalty ADD PRIMARY KEY (abp_pao_batch_id);
 
-    auto.create: true
-    auto.evolve: true
+    connection.url: "<INPUT>"
+    connection.user: "<INPUT>"
+    connection.password: "<INPUT>"
 
-    pk.mode: record_value
-    pk.fields: SKM_PRAN
+    auto.create: false
+    auto.evolve: false
+
     insert.mode: upsert
-    delete.enabled: false
+    pk.mode: record_key          
+    delete.enabled: true
 
     batch.size: 500
     max.retries: 15
     retry.backoff.ms: 5000
 
     key.converter: "org.apache.kafka.connect.json.JsonConverter"
-    key.converter.schemas.enable: false
+    key.converter.schemas.enable: true
     value.converter: "org.apache.kafka.connect.json.JsonConverter"
     value.converter.schemas.enable: true
 
-    transforms: dropTombstones
+    transforms: dropTombstones, UniversalDateTimeConverter
     transforms.dropTombstones.type: org.apache.kafka.connect.transforms.Filter
     transforms.dropTombstones.predicate: isTombstone
 
     predicates: isTombstone
     predicates.isTombstone.type: org.apache.kafka.connect.transforms.predicates.RecordIsTombstone
+
+    transforms.UniversalDateTimeConverter.type: com.example.connect.transforms.UniversalDateTimeConverter
